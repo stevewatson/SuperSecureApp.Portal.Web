@@ -1,0 +1,70 @@
+﻿@page "/"
+@attribute [Authorize]
+
+@using System.Text.Json
+@using Microsoft.AspNetCore.Authorization
+@using System.Security.Claims
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+
+<AuthorizeView>
+    <Authorized>
+        <div>The user is currently authorized</div>
+    </Authorized>
+    <NotAuthorized>
+        <div>The user is <b>NOT</b> authorized</div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@*<AuthorizeView Roles="GlobalReader">
+    <Authorized>
+        <div>The user has the <b>Global Reader</b> role</div>
+    </Authorized>
+</AuthorizeView>*@
+
+
+@code
+{
+    [CascadingParameter] private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (!user.Identity.IsAuthenticated)
+        {
+            // Handle not authenticated scenario, maybe navigate to a login page
+            Console.WriteLine("++++++ PROBLEM ++++++");
+        }
+        else
+        {
+            Console.WriteLine("--------> WORKING");
+        }
+    }
+
+    /*protected override async Task OnInitializedAsync()
+    {
+        authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        user = authState.User;
+
+        userRoles = user.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Console.WriteLine($"---:: Current user is [{JsonSerializer.Serialize(userRoles)}]");
+        }
+    // return base.OnAfterRenderAsync(firstRender);
+    }*/
+}
