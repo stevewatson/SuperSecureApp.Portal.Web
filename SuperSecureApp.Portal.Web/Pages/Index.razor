@@ -9,7 +9,7 @@
 
 <PageTitle>Index</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Hello, @authenticationState?.Result?.User?.Identity?.Name</h1>
 
 Welcome to your new app.
 
@@ -33,7 +33,7 @@ Welcome to your new app.
 
 @code
 {
-    [CascadingParameter] private Task<AuthenticationState> authenticationStateTask { get; set; }
+    [CascadingParameter] private Task<AuthenticationState> authenticationState{ get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -43,28 +43,37 @@ Welcome to your new app.
         if (!user.Identity.IsAuthenticated)
         {
             // Handle not authenticated scenario, maybe navigate to a login page
-            Console.WriteLine("++++++ PROBLEM ++++++");
+            Console.WriteLine("++++++ User is NOT authenticated ++++++");
         }
         else
         {
-            Console.WriteLine("--------> WORKING");
+            Console.WriteLine("++++++ User is authenticated ++++++");
+
+            var username = user.Identity.Name;
+            Console.WriteLine($"Username [{username}]");
+
+            // Lets get the principle claims
+            var claimsIdentity = user.Identity as ClaimsIdentity;
+            if (claimsIdentity != null)
+            {
+                Console.WriteLine($"There are {claimsIdentity.Claims.Count()} total claims associated to this user");
+                foreach (var claim in claimsIdentity.Claims)
+                {
+                    var claimType = claim.Type;
+                    var claimValue = claim.Value;
+                    Console.WriteLine($"   {claimType} = {claimValue}");
+                }
+            }
+
+            var roles = claimsIdentity?.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
+            Console.WriteLine($"There are {roles?.Count()} roles available with this user");
+            if (roles != null)
+            {
+                foreach (var role in roles)
+                {
+                    Console.WriteLine($"{role}");
+                }
+            }
         }
     }
-
-    /*protected override async Task OnInitializedAsync()
-    {
-        authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        user = authState.User;
-
-        userRoles = user.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            Console.WriteLine($"---:: Current user is [{JsonSerializer.Serialize(userRoles)}]");
-        }
-    // return base.OnAfterRenderAsync(firstRender);
-    }*/
 }
