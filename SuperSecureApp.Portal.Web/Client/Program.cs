@@ -14,7 +14,6 @@ namespace SuperSecureApp.Portal.Web
             builder.RootComponents.Add<App>("#app");
             builder.RootComponents.Add<HeadOutlet>("head::after");
 
-            
             // todosgw: added to allow easy access to tokens throughout the app using DI
             builder.Services.AddScoped<AccessTokenService>(); 
             

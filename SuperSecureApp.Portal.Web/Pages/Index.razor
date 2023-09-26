@@ -3,8 +3,10 @@
 
 @using System.Text.Json
 @using Microsoft.AspNetCore.Authorization
+@using System.IdentityModel.Tokens.Jwt
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Microsoft.IdentityModel.Tokens
 @using SuperSecureApp.Portal.Web.Services
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IAccessTokenProvider AccessTokenProvider
@@ -38,7 +40,7 @@ Welcome to your new app.
 
 @code
 {
-    [CascadingParameter] private Task<AuthenticationState> authenticationState{ get; set; }
+    [CascadingParameter] private Task<AuthenticationState> authenticationState { get; set; }
     List<Claim> UserClaims { get; set; } = new List<Claim>();
 
     protected override async Task OnInitializedAsync()
@@ -71,11 +73,10 @@ Welcome to your new app.
                 }
             }
 
-            // todosgw: Get the token directly from the provider instead of using 'AccessTokenService.GetAccessTokenAsync()'
-            // var tokenResult = await AccessTokenProvider.RequestAccessToken();
-            // var token = tokenResult.TryGetToken(out var accessToken);
-            // Console.WriteLine($"Your token status: {tokenResult?.Status}, success: {token}, value: {accessToken?.Value}");
-
+            // todosgw: Get the access token from the user principle
+            Console.WriteLine("------------------------------------------- FROM DI SERVICE ------------------------------------------");
+            var tokenResult = await AccessTokenService.GetAccessTokenAsync();
+            Console.WriteLine(tokenResult);
 
             // todosgw: Set a new role onto an existing user who is logged in, this is for development purposes only while
             //          developing layouts.
@@ -89,21 +90,6 @@ Welcome to your new app.
 
             
 
-
-            Console.WriteLine("------------------------------------------- FROM DI SERVICE ------------------------------------------");
-            var tokenResult = await AccessTokenService.GetAccessTokenAsync();
-            Console.WriteLine(tokenResult);
-
-            /*var roles = claimsIdentity?.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
-            Console.WriteLine($"There are {roles?.Count()} roles available with this user");
-            if (roles != null)
-            {
-                foreach (var role in roles)
-                {
-                    Console.WriteLine($"{role}");
-                }
-            */
-            
         }
     }
 }
