@@ -29,16 +29,17 @@ Welcome to your new app.
     </NotAuthorized>
 </AuthorizeView>
 
-@*<AuthorizeView Roles="somerole">
+<AuthorizeView Roles="superdog">
     <Authorized>
-        <div>The user has the <b>Global Reader</b> role</div>
+        <div>The user has the <b>SUPERDOG</b> role</div>
     </Authorized>
-</AuthorizeView>*@
+</AuthorizeView>
 
 
 @code
 {
     [CascadingParameter] private Task<AuthenticationState> authenticationState{ get; set; }
+    List<Claim> UserClaims { get; set; } = new List<Claim>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -70,10 +71,23 @@ Welcome to your new app.
                 }
             }
 
-
+            // todosgw: Get the token directly from the provider instead of using 'AccessTokenService.GetAccessTokenAsync()'
             // var tokenResult = await AccessTokenProvider.RequestAccessToken();
             // var token = tokenResult.TryGetToken(out var accessToken);
             // Console.WriteLine($"Your token status: {tokenResult?.Status}, success: {token}, value: {accessToken?.Value}");
+
+
+            // todosgw: Set a new role onto an existing user who is logged in, this is for development purposes only while
+            //          developing layouts.
+            Console.WriteLine("----------------------------------- ADD A ROLE FOR DEVELOPMENT PURPOSES ------------------------------");
+            UserClaims = user.Claims.ToList();
+            var userClaims = (user.Identity as ClaimsIdentity).Claims.ToList();
+            var roleClaim = new Claim(ClaimTypes.Role, "superdog");
+            userClaims.Add(roleClaim);
+            var identity = new ClaimsIdentity(userClaims, user.Identity.AuthenticationType);
+            (user.Identity as ClaimsIdentity).AddClaims(identity.Claims);
+
+            
 
 
             Console.WriteLine("------------------------------------------- FROM DI SERVICE ------------------------------------------");
@@ -89,7 +103,7 @@ Welcome to your new app.
                     Console.WriteLine($"{role}");
                 }
             */
-            }
+            
         }
     }
 }
