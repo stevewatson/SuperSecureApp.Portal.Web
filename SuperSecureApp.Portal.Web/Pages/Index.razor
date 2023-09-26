@@ -4,7 +4,12 @@
 @using System.Text.Json
 @using Microsoft.AspNetCore.Authorization
 @using System.Security.Claims
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using SuperSecureApp.Portal.Web.Services
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAccessTokenProvider AccessTokenProvider
+@inject AccessTokenService AccessTokenService
+
 
 
 <PageTitle>Index</PageTitle>
@@ -65,7 +70,17 @@ Welcome to your new app.
                 }
             }
 
-            var roles = claimsIdentity?.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
+
+            // var tokenResult = await AccessTokenProvider.RequestAccessToken();
+            // var token = tokenResult.TryGetToken(out var accessToken);
+            // Console.WriteLine($"Your token status: {tokenResult?.Status}, success: {token}, value: {accessToken?.Value}");
+
+
+            Console.WriteLine("------------------------------------------- FROM DI SERVICE ------------------------------------------");
+            var tokenResult = await AccessTokenService.GetAccessTokenAsync();
+            Console.WriteLine(tokenResult);
+
+            /*var roles = claimsIdentity?.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
             Console.WriteLine($"There are {roles?.Count()} roles available with this user");
             if (roles != null)
             {
@@ -73,6 +88,7 @@ Welcome to your new app.
                 {
                     Console.WriteLine($"{role}");
                 }
+            */
             }
         }
     }
